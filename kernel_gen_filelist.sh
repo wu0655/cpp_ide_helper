@@ -1,4 +1,8 @@
-export PATH=./build:$PATH
-time kernel_helper --code ~/work/nxp/bsp38_porting/linux-yocto-5.15/ --build ~/work/nxp/bsp38_porting/linux-yocto-5.15/out --extname ".o.cmd" --out code.txt
-time kernel_helper --code ~/work/nxp/bsp38_porting/linux-yocto-5.15/ --build ~/work/nxp/bsp38_porting/linux-yocto-5.15//out/arch/arm64/boot/ --extname ".dtb.cmd" --out dtb.txt
-merge ./code.txt ./dtb.txt -o ./filelist.txt
+_out_dir=$1
+_code_dir=${_out_dir}/source
+
+./kernel_helper --code "${_code_dir}" --build "${_out_dir}" --extname ".o.cmd" --out .tmp.code.txt
+./kernel_helper --code "${_code_dir}" --build "${_out_dir}/arch/arm64/boot/" --extname ".dtb.cmd" --out .tmp.dtb.txt
+./merge ./.tmp.code.txt ./.tmp.dtb.txt -o ./filelist.txt
+rm -f ./.tmp.code.txt ./.tmp.dtb.txt
+

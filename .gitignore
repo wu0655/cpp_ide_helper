@@ -4,6 +4,7 @@ cmake-build-*/
 *.iml
 build/
 _deps/
+out/
 
 /*.txt
-
+/*.zip
