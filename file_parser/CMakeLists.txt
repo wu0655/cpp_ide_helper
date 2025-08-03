@@ -1,5 +1,5 @@
 add_library(file_parser
-        cmd_kernel.cpp
+        cmd_kernel.cpp o_atf.cpp
 )
 
 target_include_directories(file_parser PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

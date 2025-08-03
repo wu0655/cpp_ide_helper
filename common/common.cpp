@@ -9,8 +9,8 @@
 
 #include "BS_thread_pool.hpp"
 #include "string_utils.h"
+#include "common.h"
 
-#define DEBUG 0
 
 #define MAX_THEAD_NUM 32
 
@@ -50,7 +50,6 @@ std::unordered_set<std::string> common_main(const std::string &code_dir, const s
         std::cout << "code_dir = " << code_dir << std::endl;
         std::cout << "build_dir = " << build_dir << std::endl;
         std::cout << "extname = " << extname << std::endl;
-        std::cout << "out_file = " << out_file << std::endl;
 #endif
 
     //scan directory
@@ -95,7 +94,8 @@ std::unordered_set<std::string> common_main(const std::string &code_dir, const s
 
 #else
     for(int i=0; i<cmd_files.size();i++) {
-        partial_results_cmd_files[i] = analyze_file(cmd_files[i], build_dir);
+        std::cout << "parse file=" << cmd_files[i] << std::endl;
+        partial_results_cmd_files[i] = analyze_file(cmd_files[i], code_dir, build_dir);
     }
 #endif
 

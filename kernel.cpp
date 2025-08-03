@@ -12,7 +12,6 @@
 #include "common/string_utils.h"
 #include "file_parser/file_parser.h"
 
-#define DEBUG 0
 
 #define MAX_THEAD_NUM 32
 
@@ -26,13 +25,13 @@ void print_usage(const char *program_name) {
 
 
 
-
+#if 0
 std::string get_build_path(const std::string &in) {
     std::string ret;
     fs::path path = in;
     if (fs::exists(path)) {
         while (true) {
-            fs::path p = path / "vmlinux";
+            fs::path p = path / ".config";
             if (fs::exists(p) && fs::is_regular_file(p)) {
                 ret = absolute(path).string();
                 break;
@@ -42,6 +41,7 @@ std::string get_build_path(const std::string &in) {
     }
     return ret;
 }
+#endif
 
 int main(int argc, char *argv[]) {
     if (argc != 9) {
@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
     }
 
     const std::string &code_dir = get_abs_path(args["--code"]);
-    const std::string &build_dir = get_build_path(args["--build"]);
+    const std::string &build_dir = get_abs_path(args["--build"]);
     const std::string &extname = args["--extname"];
     const std::string &out_file = args["--out"];
 

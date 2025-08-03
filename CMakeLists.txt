@@ -10,8 +10,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS " -static ")
 set(CMAKE_EXE_LINKER_FLAGS " -static ")
 
-add_executable(kernel_helper kernel.cpp)
-target_link_libraries(kernel_helper PRIVATE common file_parser)
+
 
 #set_target_properties(kernel_helper PROPERTIES LINK_FLAGS "-static")
 
@@ -22,3 +21,9 @@ add_subdirectory(file_parser)
 
 add_executable(merge merge.cpp)
 #set_target_properties(merge PROPERTIES LINK_FLAGS "-static")
+
+add_executable(kernel_helper kernel.cpp)
+target_link_libraries(kernel_helper PRIVATE common file_parser)
+
+add_executable(atf_helper atf.cpp)
+target_link_libraries(atf_helper PRIVATE common file_parser)
