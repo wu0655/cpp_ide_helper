@@ -61,7 +61,7 @@ std::unordered_set<std::string> common_main(const std::string &code_dir, const s
     //use thread pool to parse file
     std::vector<std::vector<std::string> > partial_results_cmd_files(cmd_files.size());
 
-#if 1
+#if BS_THREAD_POOL_ENABLE
     unsigned int hw_threads = std::thread::hardware_concurrency();
     unsigned int pool_size = std::min(hw_threads != 0 ? hw_threads : 4, 32u); // fallback to 4 if hw_threads is 0
     BS::thread_pool pool(pool_size);

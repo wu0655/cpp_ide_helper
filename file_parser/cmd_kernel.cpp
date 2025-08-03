@@ -22,6 +22,9 @@ static std::string get_build_path(const std::string &in) {
                 ret = absolute(path).string();
                 break;
             }
+            if (path == path.root_path()) {
+                break;  // 已到达根目录
+            }
             path = path.parent_path();
         }
     }

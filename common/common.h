@@ -9,6 +9,7 @@
 #include <unordered_set>
 
 #define DEBUG 0
+#define BS_THREAD_POOL_ENABLE 1
 
 std::unordered_set<std::string> common_main(const std::string &code_dir, const std::string &build_dir, const std::string &extname,
                                             const std::function<std::vector<std::string>(const std::string&, const std::string&, const std::string&)>& analyze_file);

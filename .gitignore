@@ -1,0 +1,9 @@
+# CLion-specific
+.idea/
+cmake-build-*/
+*.iml
+build/
+_deps/
+
+/*.txt
+
