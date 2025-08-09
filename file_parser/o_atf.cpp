@@ -70,7 +70,7 @@ std::vector<std::string> analyze_atf_o_file(const std::string &filename, const s
         }
 
         // convert relative path to absolute path
-        std::string p = get_abs_path(code_dir, entry);
+        std::string p = get_canonical_path(code_dir, entry);
         if (!p.empty())
             result.emplace_back(p);
         else {

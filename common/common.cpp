@@ -105,16 +105,19 @@ std::unordered_set<std::string> common_main(const std::string &code_dir, const s
     return file_list;
 }
 
-std::string get_abs_path(const std::string &in) {
-    fs::path path = in;
-    std::string ret;
-    if (fs::exists(path)) {
-        ret = absolute(path).string();
+std::string get_canonical_path(const std::string &in) {
+    fs::path p(in);
+    if (!fs::exists(p)) {
+        return "";
     }
-    return ret;
+    try {
+        return fs::canonical(p).string();
+    } catch (const fs::filesystem_error&) {
+        return "";  // 避免异常中断
+    }
 }
 
-std::string get_abs_path(const std::string &dir, const std::string &name) {
+std::string get_canonical_path(const std::string &dir, const std::string &name) {
     const fs::path rel = name;
     fs::path path;
     if (rel.is_absolute()) {
@@ -123,9 +126,9 @@ std::string get_abs_path(const std::string &dir, const std::string &name) {
         path = dir / rel;
     }
 
-    std::string ret;
-    if (fs::exists(path)) {
-        ret = absolute(path).string();
+    try {
+        return fs::canonical(path).string();
+    } catch (const fs::filesystem_error&) {
+        return "";  // 避免异常中断
     }
-    return ret;
 }

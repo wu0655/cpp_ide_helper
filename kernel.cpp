@@ -67,8 +67,8 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    const std::string &code_dir = get_abs_path(args["--code"]);
-    const std::string &build_dir = get_abs_path(args["--build"]);
+    const std::string &code_dir = get_canonical_path(args["--code"]);
+    const std::string &build_dir = get_canonical_path(args["--build"]);
     const std::string &extname = args["--extname"];
     const std::string &out_file = args["--out"];
 

@@ -7,6 +7,10 @@
 - 利用filelist.txt生成cscope和ctags的数据库，提高开发效率。
 - 目前测试的，支持kernel/u-boot/arm-trusted-firmware
 
+## 实现
+- 使用BS::thread_pool线程池加速。
+- 静态链接，不需要其他库支持。
+
 ## 获取
 - 自己编译
   - 运行all_build.sh

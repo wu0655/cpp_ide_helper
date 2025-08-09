@@ -13,6 +13,6 @@
 
 std::unordered_set<std::string> common_main(const std::string &code_dir, const std::string &build_dir, const std::string &extname,
                                             const std::function<std::vector<std::string>(const std::string&, const std::string&, const std::string&)>& analyze_file);
-std::string get_abs_path(const std::string &in);
-std::string get_abs_path(const std::string &dir, const std::string &name);
+std::string get_canonical_path(const std::string &in);
+std::string get_canonical_path(const std::string &dir, const std::string &name);
 #endif //COMMON_H
