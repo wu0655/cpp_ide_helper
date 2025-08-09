@@ -1,16 +1,12 @@
 #include <iostream>
 #include <filesystem>
 #include <fstream>
-#include <vector>
-#include <mutex>
-#include <map>
-#include <thread>
 #include <unordered_set>
 
 
 #include "common.h"
-#include "common/string_utils.h"
-#include "file_parser/file_parser.h"
+#include "../common/string_utils.h"
+#include "../file_parser/file_parser.h"
 
 
 #define MAX_THEAD_NUM 32
@@ -24,24 +20,6 @@ void print_usage(const char *program_name) {
 }
 
 
-
-#if 0
-std::string get_build_path(const std::string &in) {
-    std::string ret;
-    fs::path path = in;
-    if (fs::exists(path)) {
-        while (true) {
-            fs::path p = path / ".config";
-            if (fs::exists(p) && fs::is_regular_file(p)) {
-                ret = absolute(path).string();
-                break;
-            }
-            path = path.parent_path();
-        }
-    }
-    return ret;
-}
-#endif
 
 int main(int argc, char *argv[]) {
     if (argc != 9) {
@@ -90,7 +68,7 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    std::function chosen_analyze = analyze_kern_cmd_file;
+    std::function chosen_analyze = analyze_atf_o_file;
 
     //save file
     std::unordered_set<std::string> file_list = common_main(code_dir, build_dir, extname, chosen_analyze);

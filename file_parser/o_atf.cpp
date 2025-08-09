@@ -12,24 +12,8 @@
 
 namespace fs = std::filesystem;
 
-static std::string get_build_path(const std::string &in) {
-    std::string ret;
-    fs::path path = in;
-    if (fs::exists(path)) {
-        while (true) {
-            fs::path p = path / ".config";
-            if (fs::exists(p) && fs::is_regular_file(p)) {
-                ret = absolute(path).string();
-                break;
-            }
-            path = path.parent_path();
-        }
-    }
-    return ret;
-}
 
-std::vector<std::string> analyze_atf_o_file(const std::string &filename, const std::string &code_dir,
-                                            const std::string &build_dir) {
+std::vector<std::string> analyze_atf_o_file(const std::string &filename, const std::string &base_dir) {
     std::ifstream infile(filename);
     std::vector<std::string> result;
     std::vector<std::string> deps_vec;
@@ -70,7 +54,7 @@ std::vector<std::string> analyze_atf_o_file(const std::string &filename, const s
         }
 
         // convert relative path to absolute path
-        std::string p = get_canonical_path(code_dir, entry);
+        std::string p = get_canonical_path(base_dir, entry);
         if (!p.empty())
             result.emplace_back(p);
         else {

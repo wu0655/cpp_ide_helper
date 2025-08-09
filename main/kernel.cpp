@@ -1,12 +1,16 @@
 #include <iostream>
 #include <filesystem>
 #include <fstream>
+#include <vector>
+#include <mutex>
+#include <map>
+#include <thread>
 #include <unordered_set>
 
 
 #include "common.h"
-#include "common/string_utils.h"
-#include "file_parser/file_parser.h"
+#include "../common/string_utils.h"
+#include "../file_parser/file_parser.h"
 
 
 #define MAX_THEAD_NUM 32
@@ -19,13 +23,7 @@ void print_usage(const char *program_name) {
             << " --code <dir> --build <dir> --extname <name> --out <out_file>\n";
 }
 
-
-
 int main(int argc, char *argv[]) {
-    if (argc != 9) {
-        print_usage(argv[0]);
-        return 1;
-    }
 
     std::unordered_map<std::string, std::string> args;
 
@@ -68,10 +66,16 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    std::function chosen_analyze = analyze_atf_o_file;
+    //scan
+    std::vector<std::string> cmd_files = scan_directory(build_dir, extname);
+    std::cout << cmd_files.size() << " cmd files found" << std::endl;
+
+    //analyze
+    std::function chosen_analyze = analyze_kern_cmd_file;
+    std::string base_dir = find_build_path(build_dir);
+    std::unordered_set<std::string> file_list = multi_thread_analyze(cmd_files, base_dir, chosen_analyze);
 
     //save file
-    std::unordered_set<std::string> file_list = common_main(code_dir, build_dir, extname, chosen_analyze);
     for (const auto &str: file_list) {
         out << str << '\n';
     }

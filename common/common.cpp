@@ -41,70 +41,6 @@ void remove_duplicate_strings(std::vector<std::vector<std::string> > &in, std::u
     }
 }
 
-std::unordered_set<std::string> common_main(const std::string &code_dir, const std::string &build_dir,
-                                            const std::string &extname,
-                                            const std::function<std::vector<std::string>(
-                                                const std::string &, const std::string &,
-                                                const std::string &)> &analyze_file) {
-#if DEBUG
-        std::cout << "code_dir = " << code_dir << std::endl;
-        std::cout << "build_dir = " << build_dir << std::endl;
-        std::cout << "extname = " << extname << std::endl;
-#endif
-
-    //scan directory
-    std::vector<std::string> cmd_files = scan_directory(build_dir, extname);
-
-    std::cout << cmd_files.size() << " cmd files found" << std::endl;
-
-
-    //use thread pool to parse file
-    std::vector<std::vector<std::string> > partial_results_cmd_files(cmd_files.size());
-
-#if BS_THREAD_POOL_NUM
-    unsigned int hw_threads = std::thread::hardware_concurrency();
-    unsigned int pool_size = std::min(hw_threads != 0 ? hw_threads : 4, 32u); // fallback to 4 if hw_threads is 0
-    BS::thread_pool pool(pool_size);
-    const BS::multi_future<void> loop_future = pool.submit_loop<unsigned int>(0, cmd_files.size(),
-                                                                              [&cmd_files, &partial_results_cmd_files, &
-                                                                                  code_dir, &build_dir, &analyze_file](
-                                                                          const unsigned int i) {
-                                                                                  partial_results_cmd_files[i] =
-                                                                                          analyze_file(
-                                                                                              cmd_files[i], code_dir,
-                                                                                              build_dir);
-                                                                              });
-
-#if 0
-    using namespace std::chrono_literals;
-    while (!loop_future.wait_for(0ms)) {
-        std::cout << ".";
-        std::this_thread::sleep_for(1000ms);
-    }
-#else
-    while (true) {
-        if (!pool.wait_for(std::chrono::milliseconds(1000)))
-            std::cout << ".";
-        else {
-            std::cout << std::endl;
-            break;
-        }
-    }
-#endif
-
-#else
-    for(int i=0; i<cmd_files.size();i++) {
-        std::cout << "parse file=" << cmd_files[i] << std::endl;
-        partial_results_cmd_files[i] = analyze_file(cmd_files[i], code_dir, build_dir);
-    }
-#endif
-
-    //remove duplicate
-    std::unordered_set<std::string> file_list;
-    remove_duplicate_strings(partial_results_cmd_files, file_list);
-    return file_list;
-}
-
 std::string get_canonical_path(const std::string &in) {
     fs::path p(in);
     if (!fs::exists(p)) {
@@ -133,11 +69,9 @@ std::string get_canonical_path(const std::string &dir, const std::string &name) 
     }
 }
 
-std::unordered_set<std::string> multi_thread_analyze(const std::vector<std::string> &cmd_files, const std::string &code_dir,
-                                                     const std::string &build_dir,
+std::unordered_set<std::string> multi_thread_analyze(const std::vector<std::string> &cmd_files, const std::string &base_dir,
                                                      const std::function<std::vector<std::string>(
-                                                         const std::string &, const std::string &,
-                                                         const std::string &)> &analyze_file) {
+                                                         const std::string &, const std::string &)> &analyze_file) {
     //use thread pool to parse file
     std::vector<std::vector<std::string> > partial_results_cmd_files(cmd_files.size());
 
@@ -147,12 +81,11 @@ std::unordered_set<std::string> multi_thread_analyze(const std::vector<std::stri
     BS::thread_pool pool(pool_size);
     const BS::multi_future<void> loop_future = pool.submit_loop<unsigned int>(0, cmd_files.size(),
                                                                               [&cmd_files, &partial_results_cmd_files, &
-                                                                                  code_dir, &build_dir, &analyze_file](
+                                                                                  base_dir, &analyze_file](
                                                                           const unsigned int i) {
                                                                                   partial_results_cmd_files[i] =
                                                                                           analyze_file(
-                                                                                              cmd_files[i], code_dir,
-                                                                                              build_dir);
+                                                                                              cmd_files[i], base_dir);
                                                                               });
 
     while (true) {
@@ -166,8 +99,8 @@ std::unordered_set<std::string> multi_thread_analyze(const std::vector<std::stri
 
 #else
     for(int i=0; i<cmd_files.size();i++) {
-        std::cout << "parse file=" << cmd_files[i] << std::endl;
-        partial_results_cmd_files[i] = analyze_file(cmd_files[i], code_dir, build_dir);
+        //std::cout << "parse file=" << cmd_files[i] << std::endl;
+        partial_results_cmd_files[i] = analyze_file(cmd_files[i], base_dir);
     }
 #endif
 
@@ -177,21 +110,39 @@ std::unordered_set<std::string> multi_thread_analyze(const std::vector<std::stri
     return file_list;
 }
 
-std::unordered_set<std::string> single_thread_analyze(const std::vector<std::string> &cmd_files, const std::string &code_dir,
-                                                     const std::string &build_dir,
+std::unordered_set<std::string> single_thread_analyze(const std::vector<std::string> &cmd_files, const std::string &base_dir,
                                                      const std::function<std::vector<std::string>(
-                                                         const std::string &, const std::string &,
-                                                         const std::string &)> &analyze_file) {
+                                                         const std::string &, const std::string &)> &analyze_file) {
     //use thread pool to parse file
     std::vector<std::vector<std::string> > partial_results_cmd_files(cmd_files.size());
 
     for(int i=0; i<cmd_files.size();i++) {
         std::cout << "parse file=" << cmd_files[i] << std::endl;
-        partial_results_cmd_files[i] = analyze_file(cmd_files[i], code_dir, build_dir);
+        partial_results_cmd_files[i] = analyze_file(cmd_files[i], base_dir);
     }
 
     //remove duplicate
     std::unordered_set<std::string> file_list;
     remove_duplicate_strings(partial_results_cmd_files, file_list);
     return file_list;
+}
+
+
+std::string find_build_path(const std::string &in) {
+    std::string ret;
+    fs::path path = in;
+    if (fs::exists(path)) {
+        while (true) {
+            fs::path p = path / ".config";
+            if (fs::exists(p) && fs::is_regular_file(p)) {
+                ret = absolute(path).string();
+                break;
+            }
+            if (path == path.root_path()) {
+                break;  // 已到达根目录
+            }
+            path = path.parent_path();
+        }
+    }
+    return ret;
 }

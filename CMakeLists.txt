@@ -17,13 +17,4 @@ set(CMAKE_EXE_LINKER_FLAGS " -static ")
 # 添加子模块
 add_subdirectory(common)
 add_subdirectory(file_parser)
-
-
-add_executable(merge merge.cpp)
-#set_target_properties(merge PROPERTIES LINK_FLAGS "-static")
-
-add_executable(kernel_helper kernel.cpp)
-target_link_libraries(kernel_helper PRIVATE common file_parser)
-
-add_executable(atf_helper atf.cpp)
-target_link_libraries(atf_helper PRIVATE common file_parser)
+add_subdirectory(main)

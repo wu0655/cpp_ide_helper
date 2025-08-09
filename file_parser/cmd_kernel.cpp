@@ -8,30 +8,10 @@
 #include "../common/string_utils.h"
 
 
-#define MAX_THEAD_NUM 32
-
 namespace fs = std::filesystem;
 
-static std::string get_build_path(const std::string &in) {
-    std::string ret;
-    fs::path path = in;
-    if (fs::exists(path)) {
-        while (true) {
-            fs::path p = path / ".config";
-            if (fs::exists(p) && fs::is_regular_file(p)) {
-                ret = absolute(path).string();
-                break;
-            }
-            if (path == path.root_path()) {
-                break;  // 已到达根目录
-            }
-            path = path.parent_path();
-        }
-    }
-    return ret;
-}
 
-std::vector<std::string> analyze_kern_cmd_file(const std::string &filename, const std::string &code_dir, const std::string &build_dir) {
+std::vector<std::string> analyze_kern_cmd_file(const std::string &filename,  const std::string &base_dir) {
     std::ifstream infile(filename);
     std::vector<std::string> result;
     std::vector<std::string> deps_vec;
@@ -40,8 +20,6 @@ std::vector<std::string> analyze_kern_cmd_file(const std::string &filename, cons
         std::cerr << "Failed to open file: " << filename << std::endl;
         return result;
     }
-    //get out directory when build
-    std::string build_out = get_build_path(build_dir);
 
     std::string line;
     std::string buffer;
@@ -68,7 +46,7 @@ std::vector<std::string> analyze_kern_cmd_file(const std::string &filename, cons
                 if (pos != std::string::npos) {
                     std::string values_part = buffer.substr(pos + 2);
                     values_part = string_utils::strip(values_part);
-                    std::string path = get_canonical_path(build_out, values_part);
+                    std::string path = get_canonical_path(base_dir, values_part);
                     if (!path.empty() ) {
                         result.emplace_back(path);
                     } else {
@@ -104,7 +82,7 @@ std::vector<std::string> analyze_kern_cmd_file(const std::string &filename, cons
         }
 
         if (!string_utils::starts_with(entry, "$(wildcard")) {
-            std::string p = get_canonical_path(build_out, entry);
+            std::string p = get_canonical_path(base_dir, entry);
             if (!p.empty())
                 result.emplace_back(p);
             else {
