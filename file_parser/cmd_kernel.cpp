@@ -112,6 +112,5 @@ std::vector<std::string> analyze_kern_cmd_file(const std::string &filename, cons
             }
         }
     }
-    std::cout << ".";
     return result;
 }
