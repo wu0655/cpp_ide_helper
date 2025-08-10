@@ -2,7 +2,7 @@
 #include <filesystem>
 #include <fstream>
 #include <vector>
-
+#include <atomic>
 
 #include "../common/common.h"
 #include "../common/string_utils.h"
@@ -11,7 +11,7 @@
 namespace fs = std::filesystem;
 
 
-std::vector<std::string> analyze_kern_cmd_file(const std::string &filename,  const std::string &base_dir) {
+static std::vector<std::string> analyze_kern_cmd_file(const std::string &filename,  const std::string &base_dir) {
     std::ifstream infile(filename);
     std::vector<std::string> result;
     std::vector<std::string> deps_vec;
@@ -90,5 +90,13 @@ std::vector<std::string> analyze_kern_cmd_file(const std::string &filename,  con
             }
         }
     }
+
+    return result;
+}
+
+
+std::vector<std::string> analyze_kern_cmd_file(const std::string &filename,  const std::string &base_dir, std::atomic<unsigned int>& completed_tasks) {
+    std::vector<std::string> result = analyze_kern_cmd_file(filename, base_dir);
+    completed_tasks.fetch_add(1, std::memory_order_relaxed);
     return result;
 }

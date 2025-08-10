@@ -1,3 +1,4 @@
+#include <atomic>
 #include <iostream>
 #include <filesystem>
 #include <fstream>
@@ -22,6 +23,8 @@ void print_usage(const char *program_name) {
     std::cerr << "Usage: " << program_name
             << " --in <input .cmd list> --build <dir> --out <out_file>\n";
 }
+
+
 
 int main(int argc, char *argv[]) {
     std::unordered_map<std::string, std::string> args;
