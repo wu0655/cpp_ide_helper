@@ -8,7 +8,6 @@
 #include "../common/string_utils.h"
 
 
-#define MAX_THEAD_NUM 32
 
 namespace fs = std::filesystem;
 
@@ -62,5 +61,12 @@ std::vector<std::string> analyze_atf_o_file(const std::string &filename, const s
         }
     }
 
+    return result;
+}
+
+
+std::vector<std::string> analyze_atf_o_file(const std::string &filename,  const std::string &base_dir, std::atomic<unsigned int>& completed_tasks) {
+    std::vector<std::string> result = analyze_atf_o_file(filename, base_dir);
+    completed_tasks.fetch_add(1, std::memory_order_relaxed);
     return result;
 }

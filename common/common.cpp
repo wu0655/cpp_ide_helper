@@ -12,8 +12,6 @@
 #include "common.h"
 
 
-#define MAX_THEAD_NUM 32
-
 namespace fs = std::filesystem;
 
 

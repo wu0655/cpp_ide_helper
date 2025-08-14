@@ -14,8 +14,6 @@
 #include "../file_parser/file_parser.h"
 
 
-#define MAX_THEAD_NUM 32
-
 namespace fs = std::filesystem;
 
 
